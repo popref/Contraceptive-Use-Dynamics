@@ -7,10 +7,10 @@
 
 * change to a working directory where the data are stored
 * or add the full path to the 'use' command below
-cd "~/Analysis/Do Files/Senegal"
+cd "~/Analysis/Do Files/Nigeria"
 
 * open the dataset to use, selecting just the variables we are going to use
-use caseid vcal_1 v000 v005 v007 v008 v011 v018 v021 v023 using "SNIR80FL.DTA", clear
+use caseid vcal_1 v000 v005 v007 v008 v011 v018 v021 v023 using "NGIR7AFL.DTA", clear
 
 *In some countries, not all women get the contraceptive calendar module, therefore drop those who do not have vcal_1
 drop if vcal_1==""
@@ -70,7 +70,7 @@ svy, subpop(if inrange(agem,180,539)): mean usingmodern, over(cmctime) nolegend
 keep if  inrange(agem,180,539)
 
 
-  foreach i in 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76   {
+  foreach i in 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72  {
  svy: mean usingmodern if i==`i'
  		matrix a=r(table)
         gen usingmodern_m_`i'=a[1,1]
@@ -82,21 +82,22 @@ keep if  inrange(agem,180,539)
 
 collapse (mean) usingmodern_* using_ll_* using_ul_* , by(cmctime)
  
+ 
+ *For Guinea need to add 16 months to the graph to get to the prior DHS which was 6 years before instead of 5: 
+ foreach i in 73 74 75 76 77  {
+ gen usingmodern_m_`i' =.
+ gen using_ll_`i' =.
+ gen using_ul_`i' =.
+ }
+ 
+ 
 reshape long usingmodern_m_ using_ll_ using_ul_ , i(cmctime) j(num)
 
  
-**Insert cross sectional MCPR estimates manually for 2018, 2017, 2016, 2015, 2014 for the specified age range (age 15-44)
-*dhs 2018
-gen DHS_mcpr = 17.78 if num==17
-*dhs 2017
-replace DHS_mcpr = 18.74 if num==25
-*dhs 2016
-replace DHS_mcpr = 16.41 if num==39
-*dhs 2015
-replace DHS_mcpr = 15.3 if num==52
-*dhs 2014
-replace DHS_mcpr = 14.7 if num==64
-
+**Insert cross sectional MCPR estimates manually for 2014, 2011 for the specified age range (age 15-44)
+gen DHS_mcpr = 10.72 if num==13
+replace DHS_mcpr = 11.45 if num ==77
+ 
 
  
 graph twoway scatter  usingmodern_m_ num , ///
@@ -105,9 +106,9 @@ graph twoway scatter  usingmodern_m_ num , ///
 	scatter DHS_mcpr num , ///
 	ytitle("MCPR", size(*.75) linegap(30) ) ///
 	scheme(s2color) ///
-	xlabel(17 "2018" 25 "2017" 39 "2016" 52 "2015" 64 "2014" ) ///
-	xtitle("Year") legend(r(2) order (1 "MCPR, DHS Calendar Estimate" 3  "MCPR 2018, 2017, 2016, 2015, 2014" ))  ///
+	xlabel(13 "2018"  77 "2013", labsize(small) ) ///
+	xtitle("Year") legend(r(2) order (1 "MCPR, DHS Calendar Estimate" 3  "MCPR, DHS 2018 & 2013" ))  ///
 	graphregion(color(white)  )  ysize(10) xsize(10)  ///
-	caption("Data: {it:DHS Senegal}", size(*.7)) title("Calendar Quality Assessment, Senegal")
+	caption("Data: {it:DHS Nigeria}", size(*.7)) title("Calendar Quality Assessment, Nigeria")
 
  
